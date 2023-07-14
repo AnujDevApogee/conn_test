@@ -4,10 +4,13 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.testingbl.R
 import com.example.testingbl.databinding.StartScreenLayoutBinding
 import com.example.testingbl.utils.PermissionUtils
 import com.permissionx.guolindev.PermissionX
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class StartScreenFragment(private val enableBlue: () -> Unit) :
@@ -21,23 +24,26 @@ class StartScreenFragment(private val enableBlue: () -> Unit) :
             goToTemp()
         }
 
-        PermissionX.init(requireActivity())
-            .permissions(PermissionUtils.permissions)
-            .request { allGranted, grantedList, deniedList ->
-                if (allGranted) {
-                    Toast.makeText(
-                        requireActivity(),
-                        "All permissions are granted",
-                        Toast.LENGTH_LONG
-                    ).show()
-                } else {
-                    Toast.makeText(
-                        requireActivity(),
-                        "These permissions are denied: $deniedList",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
+      lifecycleScope.launch {
+          delay(8000)
+          PermissionX.init(requireActivity())
+              .permissions(PermissionUtils.permissions)
+              .request { allGranted, grantedList, deniedList ->
+                  if (allGranted) {
+                      Toast.makeText(
+                          requireActivity(),
+                          "All permissions are granted",
+                          Toast.LENGTH_LONG
+                      ).show()
+                  } else {
+                      Toast.makeText(
+                          requireActivity(),
+                          "These permissions are denied: $deniedList",
+                          Toast.LENGTH_LONG
+                      ).show()
+                  }
+              }
+      }
     }
 
     private fun goToTemp() {

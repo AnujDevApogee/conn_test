@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 
 interface TemperatureAndHumidityReceivedManger {
 
-    val data: MutableSharedFlow<Response<TemperatureData>>
+//    val data: MutableSharedFlow<Response<TemperatureData>>
 
     fun reconnect()
 

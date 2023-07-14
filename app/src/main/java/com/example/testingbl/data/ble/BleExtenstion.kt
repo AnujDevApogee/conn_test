@@ -7,6 +7,8 @@ import android.util.Log
 import java.util.*
 
 const val CCCD_DESCRIPTOR_UUID = "00002902-0000-1000-8000-00805F9B34FB"
+//"6e400003-b5a3-f393-e0a9-e50e24dcca9e"
+// "00002902-0000-1000-8000-00805F9B34FB"
 
 fun BluetoothGatt.printGattTable() {
     if (services.isEmpty()) {
