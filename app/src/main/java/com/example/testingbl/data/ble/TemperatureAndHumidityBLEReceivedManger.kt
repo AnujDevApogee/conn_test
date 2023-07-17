@@ -33,11 +33,13 @@ class TemperatureAndHumidityBLEReceivedManger(
 
     private val DEVICE_NAME =
         "D9:2D:9A:10:91:98"//"NAVIK50-1.0__2328532"//"Mivi Collar D25"//"NAVIK200-1.1_15"
-    private val TEMP_HUMIDITY_SERVICE_UIID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e"
+    private val DEVICE_SERVICE_UIID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e"
 
     //"00001800-0000-1000-8000-00805f9b34fb"// "0000aa20-0000-1000-8000-00805f9b34fb" // Need the Service UIID
-    private val TEMP_HUMIDITY_CHARACTERISTICS_UUID =
-        "6e400003-b5a3-f393-e0a9-e50e24dcca9e"//"00002a00-0000-1000-8000-00805f9b34fb"
+    private val DEVICE_CHARACTERISTICS_UUID = "6e400003-b5a3-f393-e0a9-e50e24dcca9e"
+    private val DEVICE_WRITE_CHARACTERISTICS_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e"
+    //    "6e400003-b5a3-f393-e0a9-e50e24dcca9e"
+    //"00002a00-0000-1000-8000-00805f9b34fb"
     // "0000aa21-0000-1000-8000-00805f9b34fb" // Need CHARACTERISTICS uuid
 
     private var currentConnectionAttempt = 1
@@ -142,7 +144,7 @@ class TemperatureAndHumidityBLEReceivedManger(
         override fun onMtuChanged(gatt: BluetoothGatt, mtu: Int, status: Int) {
             Log.d("MTU_RANGE", "onMtuChanged: Mtu range => $mtu")
             val characteristic =
-                findCharacteristic(TEMP_HUMIDITY_SERVICE_UIID, TEMP_HUMIDITY_CHARACTERISTICS_UUID)
+                findCharacteristic(DEVICE_SERVICE_UIID, DEVICE_CHARACTERISTICS_UUID)
             if (characteristic == null) {
                 coroutineScope.launch {
                     _data.value =
@@ -160,7 +162,7 @@ class TemperatureAndHumidityBLEReceivedManger(
         ) {
             with(characteristic) {
                 when (uuid) {
-                    UUID.fromString(TEMP_HUMIDITY_CHARACTERISTICS_UUID) -> {
+                    UUID.fromString(DEVICE_CHARACTERISTICS_UUID) -> {
                         //XX XX XX XX XX XX
                         val bytes = String(value)
                         Log.i("INFO_BLE", "onCharacteristicChanged: $bytes")
@@ -179,27 +181,27 @@ class TemperatureAndHumidityBLEReceivedManger(
                         }
                     }
 
+                    UUID.fromString(DEVICE_WRITE_CHARACTERISTICS_UUID)-> {
+                        val bytes = String(value)
+                        Log.i("INFO_BLE", " WRITE  onCharacteristicChanged: $bytes")
+                        Unit
+                    }
+
                     else -> Unit
                 }
             }
-        }
-
-        override fun onCharacteristicWrite(
-            gatt: BluetoothGatt?,
-            characteristic: BluetoothGattCharacteristic?,
-            status: Int
-        ) {
-            Log.i("INFO_RES", "onCharacteristicWrite: ${characteristic?.service}")
         }
 
     }
 
     fun writeSample() {
         val char =
-            findCharacteristic(TEMP_HUMIDITY_SERVICE_UIID, TEMP_HUMIDITY_CHARACTERISTICS_UUID)
-        val ccdUuid = UUID.fromString(TEMP_HUMIDITY_CHARACTERISTICS_UUID)
+            findCharacteristic(DEVICE_SERVICE_UIID, DEVICE_WRITE_CHARACTERISTICS_UUID)
+        val ccdUuid = UUID.fromString(DEVICE_WRITE_CHARACTERISTICS_UUID)
         char?.service?.getCharacteristic(ccdUuid)?.let { charis ->
-            val string = "unlog psrdopa"+"\r\n"
+            val string = "log psrdopa ontime 1"+"\r\n"
+            Log.d("WRITE_SAMPLE",
+                "writeSample: writeable ${charis.isWritable()} and Readable ${charis.isReadable()}")
             gatt?.let {
                 charis.value = string.toByteArray(StandardCharsets.UTF_8)
                 val op = it.writeCharacteristic(charis)
@@ -247,8 +249,8 @@ class TemperatureAndHumidityBLEReceivedManger(
     }
 
 
-    override fun reconnect() {
-        gatt?.connect()
+    override fun reconnect(): Boolean {
+       return (gatt?.connect())?:false
     }
 
     override fun disconnect() {
@@ -268,7 +270,7 @@ class TemperatureAndHumidityBLEReceivedManger(
     override fun closeConnection() {
         bleScanner.stopScan(scanCallback)
         val characteristic =
-            findCharacteristic(TEMP_HUMIDITY_SERVICE_UIID, TEMP_HUMIDITY_CHARACTERISTICS_UUID)
+            findCharacteristic(DEVICE_SERVICE_UIID, DEVICE_CHARACTERISTICS_UUID)
         if (characteristic != null) {
             disconnectCharacteristic(characteristic)
         }

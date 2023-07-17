@@ -7,7 +7,7 @@ interface TemperatureAndHumidityReceivedManger {
 
 //    val data: MutableSharedFlow<Response<TemperatureData>>
 
-    fun reconnect()
+    fun reconnect():Boolean
 
     fun disconnect()
 

@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothAdapter
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -59,7 +60,7 @@ class TemperatureScreenFragment(private val enableBlue: () -> Unit) :
         }
 
         binding.reconnectBtn.setOnClickListener {
-            repo?.reconnect()
+            Toast.makeText(activity, "RECONNECTED ${repo?.reconnect()}", Toast.LENGTH_SHORT).show()
         }
 
 
