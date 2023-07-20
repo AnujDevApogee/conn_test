@@ -11,21 +11,20 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.testingbl.R
 import com.example.testingbl.data.ConnectionState
-import com.example.testingbl.data.ble.TemperatureAndHumidityBLEReceivedManger
+import com.example.testingbl.data.ble.BLERepositoryReceivedManger
 import com.example.testingbl.databinding.TemperatureLayoutBinding
 import com.example.testingbl.di.BluetoothCommunication
 import com.example.testingbl.utils.BlueToothBroadCastReceiver
 import com.example.testingbl.utils.Response
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
-class TemperatureScreenFragment(private val enableBlue: () -> Unit) :
+class BLEScreenFragment(private val enableBlue: () -> Unit) :
     Fragment(R.layout.temperature_layout) {
 
     private lateinit var binding: TemperatureLayoutBinding
 
-    private var repo: TemperatureAndHumidityBLEReceivedManger? = null
+    private var repo: BLERepositoryReceivedManger? = null
 
     private var bluetoothReg: BlueToothBroadCastReceiver? = null
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -38,7 +37,7 @@ class TemperatureScreenFragment(private val enableBlue: () -> Unit) :
         }
 
         repo =
-            TemperatureAndHumidityBLEReceivedManger(
+            BLERepositoryReceivedManger(
                 BluetoothCommunication.getInstance(requireActivity()).getBluetoothAdaptor(),
                 requireActivity()
             )

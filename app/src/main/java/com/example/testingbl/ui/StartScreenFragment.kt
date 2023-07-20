@@ -47,7 +47,7 @@ class StartScreenFragment(private val enableBlue: () -> Unit) :
     }
 
     private fun goToTemp() {
-        val fragment: Fragment = TemperatureScreenFragment {
+        val fragment: Fragment = BLEScreenFragment {
             enableBlue.invoke()
         }
         val fragmentManager = requireActivity().supportFragmentManager

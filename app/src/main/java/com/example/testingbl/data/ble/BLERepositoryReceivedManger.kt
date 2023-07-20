@@ -14,8 +14,8 @@ import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.util.Log
 import com.example.testingbl.data.ConnectionState
-import com.example.testingbl.data.TemperatureAndHumidityReceivedManger
-import com.example.testingbl.data.TemperatureData
+import com.example.testingbl.data.BLEReceivedManger
+import com.example.testingbl.data.BLEData
 import com.example.testingbl.utils.Response
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,9 +26,9 @@ import java.nio.charset.StandardCharsets
 import java.util.UUID
 
 @SuppressLint("MissingPermission")
-class TemperatureAndHumidityBLEReceivedManger(
+class BLERepositoryReceivedManger(
     private val bluetoothAdapter: BluetoothAdapter, private val context: Context
-) : TemperatureAndHumidityReceivedManger {
+) : BLEReceivedManger {
 
 
     private val DEVICE_NAME =
@@ -45,8 +45,8 @@ class TemperatureAndHumidityBLEReceivedManger(
     private var currentConnectionAttempt = 1
     private var MAXIMUM_CONNECTION_ATTEMPTS = 5
 
-    private val _data = MutableStateFlow<Response<TemperatureData>?>(null)
-    val data: StateFlow<Response<TemperatureData>?>
+    private val _data = MutableStateFlow<Response<BLEData>?>(null)
+    val data: StateFlow<Response<BLEData>?>
         get() = _data
 
 
@@ -99,12 +99,12 @@ class TemperatureAndHumidityBLEReceivedManger(
                         _data.value = (Response.Loading(message = "Discovering Services..."))
                     }
                     gatt.discoverServices()
-                    this@TemperatureAndHumidityBLEReceivedManger.gatt = gatt
+                    this@BLERepositoryReceivedManger.gatt = gatt
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                     coroutineScope.launch {
                         _data.value = (
                                 Response.Success(
-                                    data = TemperatureData(
+                                    data = BLEData(
                                         0f, 0f, ConnectionState.DisConnected
                                     )
                                 )
@@ -148,7 +148,7 @@ class TemperatureAndHumidityBLEReceivedManger(
             if (characteristic == null) {
                 coroutineScope.launch {
                     _data.value =
-                        (Response.Error("Could not find temperature and Humidity Publisher"))
+                        (Response.Error("Could not find Service"))
                 }
                 return
             }
@@ -156,6 +156,7 @@ class TemperatureAndHumidityBLEReceivedManger(
             enableNotification(characteristic)
         }
 
+        @Deprecated("Deprecated in Java")
         override fun onCharacteristicChanged(
             gatt: BluetoothGatt,
             characteristic: BluetoothGattCharacteristic
@@ -169,7 +170,7 @@ class TemperatureAndHumidityBLEReceivedManger(
                         val multiplicator = 22//if (value.first().toInt() > 0) -1 else 1
                         val temperature = 11//value[1].toInt() + value[2].toInt() / 10f
                         val humidity = 24//value[4].toInt() + value[5].toInt() / 10f
-                        val tempHumidityResult = TemperatureData(
+                        val tempHumidityResult = BLEData(
                             multiplicator * temperature.toFloat(),
                             humidity.toFloat(),
                             ConnectionState.Connected

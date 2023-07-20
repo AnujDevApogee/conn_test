@@ -1,9 +1,6 @@
 package com.example.testingbl.data
 
-import com.example.testingbl.utils.Response
-import kotlinx.coroutines.flow.MutableSharedFlow
-
-interface TemperatureAndHumidityReceivedManger {
+interface BLEReceivedManger {
 
 //    val data: MutableSharedFlow<Response<TemperatureData>>
 
